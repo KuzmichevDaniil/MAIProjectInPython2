@@ -1,7 +1,23 @@
 import argparse
-from pathlib import Path
 import sys
-from streamstats.parsers import parser_csv
+import csv
+import json
+
+from pathlib import Path
+from streamstats.parsers import *
+from streamstats.errors import *
+
+def validation_data(args, file):
+    for arg in args.format:
+        if arg not in ['csv', 'jsonl']:
+            raise UnknownFormat(arg)
+            
+    if not file.is_file():
+        raise FileNotFound(file)
+                
+    elif file.suffix.lower() not in ['.csv', '.jsonl']:
+        raise UnsupportedExtention(file)
+                
 
 def main():
     parser = argparse.ArgumentParser(prog = "streamstats", add_help = False)
@@ -9,24 +25,35 @@ def main():
     
     sub_analyze = subparsers.add_parser("analyze", add_help = False)
     sub_analyze.add_argument("input", nargs = "+", type = Path)
-    sub_analyze.add_argument("--format", dest = "format", choices = ["csv", "jsonl"], required = True)
+    sub_analyze.add_argument("--format", dest = "format", required = True, nargs = "+")
     sub_analyze.add_argument("--output", dest = "output", type = Path)
     sub_analyze.add_argument("--skip-invalid", dest = "skip_invalid")
     
     args = parser.parse_args()
     
     if args.command == "analyze":
-        for file in args.input:
-            if not file.is_file():
-                print(f"Ошибка, файл {file} не найден!", file = sys.stderr)
-                sys.exit(2)
+        try:
+            for file in args.input:
                 
-        if args.format == "csv":
-            parser_csv(args.input)
-        elif args.format == "jsonl":
-            pass
+                validation_data(args, file)
                 
-    
-    
+                if file.suffix.lower() == '.csv' and 'csv' in args.format:
+                    with file.open(mode = 'r', encoding = "utf-8") as fl:
+                        for num_line, line in enumerate(csv.DictReader(fl), start = 1):
+                            parser_csv(num_line, line)
+                                            
+                elif file.suffix.lower() == '.jsonl' and 'jsonl' in args.format:
+                    with file.open(mode = 'r', encoding = 'utf-8') as fl:
+                        for num_line, line in enumerate(fl, start = 1):
+                            parser_jsonl(num_line, line)
+                
+                else:
+                    print("Несовместимый файл с форматом!", file = sys.stderr)
+                    sys.exit(2)
+           
+        except StreamStatsErrors as err:
+            print(err, file = sys.stderr)
+            sys.exit(2)
+     
 if __name__ == "__main__":
     main()

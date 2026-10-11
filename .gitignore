@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+#files
+*.csv
+*.jsonl
+
 # Distribution / packaging
 .Python
 build/
@@ -218,9 +222,3 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-
-# files
-broken.csv
-broken.jsonl
-events.jsonl
-events.csv
