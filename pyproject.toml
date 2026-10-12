@@ -1,0 +1,11 @@
+[project]
+name = "Streaming file analyzer"
+version = ""
+description = "Python-пакет streamstats, который читает логи-события из CSV и JSONL построчно, не загружая файл в память, считает статистику и пишет отчёт"
+readme = "README.md"
+requires-python = ">=3.14"
+authors = [{name = "Кузмичев Даниил"}]
+dependencies = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.9"
+]

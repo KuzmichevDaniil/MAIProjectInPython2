@@ -16,3 +16,19 @@ class UnsupportedExtention(StreamStatsErrors):
 class DataError(StreamStatsErrors):
     def __init__(self):
         super().__init__("Несовместимый файл с форматом!")
+
+class InvalidTimestampError(StreamStatsErrors):
+    def __init__(self, err):
+        super().__init__(err)
+        
+class InvalidLevelError(StreamStatsErrors):
+    def __init__(self, err):
+        super().__init__(err)
+        
+class InvalidSourceError(StreamStatsErrors):
+    def __init__(self, err):
+        super().__init__(err)
+        
+class InvalidMessageError(StreamStatsErrors):
+    def __init__(self, err):
+        super().__init__(err)

@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from streamstats.parsers import *
 from streamstats.errors import *
+from streamstats.analysis import *
 
 def validation_data(args, file):
     for arg in args.format:
@@ -38,19 +39,17 @@ def main():
                 validation_data(args, file)
                 
                 if file.suffix.lower() == '.csv' and 'csv' in args.format:
-                    with file.open(mode = 'r', encoding = "utf-8") as fl:
-                        for num_line, line in enumerate(csv.DictReader(fl), start = 1):
-                            parser_csv(num_line, line)
+                    for line in parser_csv(file):
+                        analyzer(stats, make_event(line))
                                             
                 elif file.suffix.lower() == '.jsonl' and 'jsonl' in args.format:
-                    with file.open(mode = 'r', encoding = 'utf-8') as fl:
-                        for num_line, line in enumerate(fl, start = 1):
-                            parser_jsonl(num_line, line)
+                    for line in parser_jsonl(file):
+                        analyzer(stats, make_event(line))
                 
                 else:
                     print("Несовместимый файл с форматом!", file = sys.stderr)
                     sys.exit(2)
-           
+        
         except StreamStatsErrors as err:
             print(err, file = sys.stderr)
             sys.exit(2)
