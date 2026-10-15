@@ -1,7 +1,7 @@
 import json
 import csv
 
-from datetime import datetime
+from datetime import datetime, UTC
 from streamstats.errors import *
 
 def parser_csv(file):
@@ -14,22 +14,28 @@ def parser_jsonl(file):
         for line in enumerate(fl, start=1):
             yield json.loads(line[1])
 
+def parser_timestamp(ts):
+    timestamp = datetime.fromisoformat(ts)
+    if timestamp.tzinfo == None:
+        return timestamp.replace(tzinfo=UTC)
+    else:
+        return timestamp.astimezone(UTC)
 
 def make_event(raw: dict[str, str]):
-    timestamp_raw = raw.get("timestamp")
+    timestamp = raw.get("timestamp")
     level = raw.get("level")
     source = raw.get("source")
     message = raw.get("message")
     
-    if not isinstance(timestamp_raw, str) or not timestamp_raw:
+    if not isinstance(timestamp, str) or not timestamp:
         raise InvalidTimestampError("Некорректная дата!")
     
     try:
-        timestamp = datetime.fromisoformat(timestamp_raw)
+        parser_timestamp(timestamp)
     except StreamStatsErrors:
-        raise InvalidTimestampError(f"Неверный формат времени {timestamp_raw}")
+        raise InvalidTimestampError(f"Неверный формат времени {timestamp}")
     
-    if not isinstance(level, str) or not level or not ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
+    if not isinstance(level, str) or not level in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
         raise InvalidLevelError("Некорректный уровень!")
     
     elif not isinstance(source, str) or not source:

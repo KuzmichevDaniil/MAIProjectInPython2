@@ -31,6 +31,7 @@ def main():
     sub_analyze.add_argument("--skip-invalid", dest = "skip_invalid")
     
     args = parser.parse_args()
+    stats = make_stats()
     
     if args.command == "analyze":
         try:
@@ -49,6 +50,11 @@ def main():
                 else:
                     print("Несовместимый файл с форматом!", file = sys.stderr)
                     sys.exit(2)
+            
+            if args.output:
+                pass
+            else:
+                print(final_result(stats))
         
         except StreamStatsErrors as err:
             print(err, file = sys.stderr)
