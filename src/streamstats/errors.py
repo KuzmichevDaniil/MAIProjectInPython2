@@ -32,3 +32,11 @@ class InvalidSourceError(StreamStatsErrors):
 class InvalidMessageError(StreamStatsErrors):
     def __init__(self, err):
         super().__init__(err)
+        
+class FileExists(StreamStatsErrors):
+    def __init__(self, file):
+        super().__init__(f"Файл {file} уже существует!")
+        
+class MissingRequiredHeadings(StreamStatsErrors):
+    def __init__(self, err):
+        super().__init__(err)

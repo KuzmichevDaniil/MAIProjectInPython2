@@ -7,6 +7,7 @@ from pathlib import Path
 from streamstats.parsers import *
 from streamstats.errors import *
 from streamstats.analysis import *
+from streamstats.report import *
 
 def validation_data(args, file):
     for arg in args.format:
@@ -52,7 +53,7 @@ def main():
                     sys.exit(2)
             
             if args.output:
-                pass
+                make_report(stats, args.output)
             else:
                 print(final_result(stats))
         
